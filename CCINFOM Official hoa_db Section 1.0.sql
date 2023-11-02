@@ -463,6 +463,142 @@ CREATE TABLE IF NOT EXISTS residential_prop (
     REFERENCES	household(household_id)
 );
 
+-- -----------------------------------------------------
+-- Table monthly_duebill
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS monthly_duebill;
+CREATE TABLE IF NOT EXISTS monthly_duebill (
+  monthly_duebillid  INT NOT NULL,
+  date_generated 	 DATE NOT NULL,
+  deduction_amount 	 DECIMAL(10,2),
+  reg_monthlydue 	 DECIMAL(10,2) NOT NULL,
+  unpaid_pastdues 	 DECIMAL(10,2) NOT NULL,
+  total_amount 		 DECIMAL(10,2) NOT NULL,
+  penalties_incurred DECIMAL(10,2) NOT NULL,
+  household_id 		 INT(5) NOT NULL,
+  INDEX 			 (monthly_duebillid ASC),
+  INDEX 			 (date_generated ASC),
+  INDEX 			 (household_id ASC),
+  PRIMARY KEY 		 (monthly_duebillid),
+  FOREIGN KEY 		 (household_id)
+	REFERENCES 		 household(household_id)
+);
+
+-- -----------------------------------------------------
+-- Table payments
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS payments;
+CREATE TABLE IF NOT EXISTS payments (
+  or_number 		VARCHAR(5) NOT NULL,
+  payment_date 		DATE NOT NULL,
+  amount_paid 		DECIMAL(10,2) NOT NULL,
+  paying_resident 	INT(5) NOT NULL,
+  receiving_officer INT(5),
+  INDEX 			(or_number ASC),
+  INDEX 			(payment_date ASC),
+  INDEX 			(paying_resident ASC),
+  PRIMARY KEY 		(or_number),
+  FOREIGN KEY 		(paying_resident)
+	REFERENCES 		resident(resident_id),
+  FOREIGN KEY 		(receiving_officer)
+	REFERENCES 		hoa_officer(officer_id)
+);
+
+-- -----------------------------------------------------
+-- Table incident
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS incident;
+CREATE TABLE IF NOT EXISTS incident (
+  incident_id 			INT NOT NULL,
+  date 					DATE NOT NULL,
+  description 			VARCHAR(255) NOT NULL,
+  penalty_imposed 		DECIMAL(10,2) NOT NULL,
+  rulenum_violated 		INT NOT NULL,
+  investigating_officer INT(5) NOT NULL,
+  seconding_officer 	INT(5) NOT NULL,
+  resident_id 			INT(5) NOT NULL,
+  INDEX 				(incident_id ASC),
+  INDEX 				(date ASC),
+  INDEX 				(rulenum_violated ASC),
+  INDEX 				(investigating_officer ASC),
+  INDEX 				(seconding_officer ASC),
+  PRIMARY KEY 			(incident_id),
+  FOREIGN KEY 			(investigating_officer)
+	REFERENCES 			hoa_officer(officer_id),
+  FOREIGN KEY 			(seconding_officer)
+	REFERENCES 			hoa_officer(officer_id),
+  FOREIGN KEY 			(resident_id)
+	REFERENCES 			resident(resident_id)
+);
+
+-- -----------------------------------------------------
+-- Table person_involved
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS person_involved;
+CREATE TABLE IF NOT EXISTS person_involved (
+  person_involvedid INT NOT NULL,
+  first_name 		VARCHAR(45) NOT NULL,
+  middle_name 		VARCHAR(45) NOT NULL,
+  last_name 		VARCHAR(45) NOT NULL,
+  pi_type 			ENUM('R','NR') NOT NULL,
+  incident_id 		INT NOT NULL,
+  INDEX 			(person_involvedid ASC),
+  INDEX 			(first_name ASC),
+  INDEX 			(last_name ASC),
+  INDEX 			(pi_type ASC),
+  INDEX 			(incident_id ASC),
+  PRIMARY KEY 		(person_involvedid),
+  FOREIGN KEY 		(incident_id)
+	REFERENCES 		incident(incident_id)
+);
+
+-- -----------------------------------------------------
+-- Table evidence
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS evidence;
+CREATE TABLE IF NOT EXISTS evidence (
+  evidence_id 		  INT NOT NULL,
+  name 				  VARCHAR(45) NOT NULL,
+  description 		  VARCHAR(45) NOT NULL,
+  file_name 		  VARCHAR(45) NOT NULL,
+  submitting_resident ENUM('R','NR') NOT NULL,
+  accepting_officer   INT NOT NULL,
+  date_submitted 	  DATE NOT NULL,
+  incident_id 		  INT NOT NULL,
+  INDEX 			  (evidence_id ASC),
+  INDEX 			  (name ASC),
+  INDEX 			  (file_name ASC),
+  INDEX 			  (submitting_resident ASC),
+  INDEX 			  (accepting_officer ASC),
+  INDEX 			  (incident_id ASC),
+  PRIMARY KEY 		  (evidence_id),
+  FOREIGN KEY 		  (submitting_resident)
+	REFERENCES 		  resident(resident_id),
+  FOREIGN KEY 		  (accepting_officer)
+	REFERENCES 		  hoa_officer(officer_id),
+  FOREIGN KEY 		  (incident_id)
+	REFERENCES 		  incident(incident_id)
+);
+
+-- -----------------------------------------------------
+-- Table incentives_anddiscounts
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Table nonmonetary_incentives
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Table donation
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Table donation_picture
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Table donation_id
+-- -----------------------------------------------------
 
 -- -----------------------------------------------------
 -- Add records to regions

@@ -584,113 +584,117 @@ CREATE TABLE IF NOT EXISTS evidence (
 -- Table incentives_anddiscounts
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS incentives_anddiscounts;
-CREATE TABLE IF NOT EXISTS incentives_anddiscounts
-(
+CREATE TABLE IF NOT EXISTS incentives_anddiscounts (
     incentives_anddiscounts_id INT NOT NULL,
-    bill_period INT NOT NULL,
-    awarded_resident INT NOT NULL,
-    classification ENUM('I','D') NOT NULL,
-    amount_orrate DECIMAL(10,2) NOT NULL,
-    reason VARCHAR(45),
-    authorizing_officer INT(5) NOT NULL,
-
-    PRIMARY KEY(incentives_anddiscounts_id),
-
-    INDEX (awarded_resident ASC),
-    INDEX (bill_period ASC),
-
-    FOREIGN KEY(bill_period)
-	REFERENCES monthly_duebill(monthly_duebillid),
-    FOREIGN KEY(awarded_resident)
-        REFERENCES resident(resident_id),
-    FOREIGN KEY(authorizing_officer)
-        REFERENCES hoa_officer(officer_id)
+    bill_period 			   INT NOT NULL,
+    awarded_resident 		   INT NOT NULL,
+    classification 			   ENUM('I','D') NOT NULL,
+    amount_orrate 			   DECIMAL(10,2) NOT NULL,
+    reason 					   VARCHAR(255) NOT NULL,
+    authorizing_officer 	   INT(5) NOT NULL,
+    INDEX 					   (incentives_anddiscounts_id ASC),
+    INDEX 					   (awarded_resident ASC),
+    INDEX 					   (bill_period ASC),
+    INDEX 					   (classification ASC),
+    INDEX 					   (authorizing_officer ASC),
+    PRIMARY KEY				   (incentives_anddiscounts_id),
+    FOREIGN KEY				   (bill_period)
+		REFERENCES 			   monthly_duebill(monthly_duebillid),
+    FOREIGN KEY				   (awarded_resident)
+        REFERENCES 			   resident(resident_id),
+    FOREIGN KEY				   (authorizing_officer)
+        REFERENCES 			   hoa_officer(officer_id)
     
 );
+
 -- -----------------------------------------------------
 -- Table nonmonetary_incentives
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS nonmonetary_incentives;
-CREATE TABLE IF NOT EXISTS nonmonetary_incentives
-(
-    incentive_id INT NOT NULL,
-    description VARCHAR(255) NOT NULL,
-    validity_startdate DATE NOT NULL,
-    validity_enddate DATE NOT NULL,
-    status ENUM('Valid','Expired','Availed','Cancelled') NOT NULL, --'Availed' should really be either 'Claimed' or 'Applied' but whatever. 'Availed <some offer>' is a common mistake - 'Availed OF <some offer> is the grammatically correct form.
-    reason VARCHAR(45) NOT NULL,
+CREATE TABLE IF NOT EXISTS nonmonetary_incentives (
+    incentive_id 		INT NOT NULL,
+    description 		VARCHAR(255) NOT NULL,
+    validity_startdate 	DATE NOT NULL,
+    validity_enddate 	DATE NOT NULL,
+    status 				ENUM('Valid','Expired','Availed','Cancelled') NOT NULL, 
+    reason 				VARCHAR(255) NOT NULL,
     authorizing_officer INT(5) NOT NULL,
-    awarded_resident INT(5) NOT NULL,
-
-    PRIMARY KEY(incentive_id),
-
-    INDEX (awarded_resident ASC),
-
-    FOREIGN KEY(authorizing_officer)
-    	REFERENCES hoa_officer(officer_id),
-    FOREIGN KEY(awarded_resident) 
-    	REFERENCES resident(resident_id)
+    awarded_resident 	INT(5) NOT NULL,
+    INDEX 				(incentive_id ASC),
+    INDEX 				(validity_startdate ASC),
+    INDEX 				(validity_enddate ASC),
+    INDEX 				(status ASC),
+    INDEX 				(authorizing_officer ASC),
+    INDEX 				(awarded_resident ASC),
+    PRIMARY KEY			(incentive_id),
+    FOREIGN KEY			(authorizing_officer)
+    	REFERENCES 		hoa_officer(officer_id),
+    FOREIGN KEY			(awarded_resident) 
+    	REFERENCES 		resident(resident_id)
 );
+
 -- -----------------------------------------------------
 -- Table donation
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS donation;
-CREATE TABLE IF NOT EXISTS donation
-(
-    donation_id INT NOT NULL,
-    donor_name VARCHAR(45) NOT NULL,
-    donor_type ENUM('R','NR') NOT NULL,
-    donor_address VARCHAR(45) NOT NULL,
-    donation_date DATE NOT NULL,
-    donation_form INT NOT NULL,
-    status ENUM('E','D') INT NOT NULL,
-    accepting_officer INT NOT NULL,
-
-    PRIMARY KEY (donation_id),
-
-    INDEX (donor_name ASC),
-    INDEX (accepting_officer ASC),
-
-    FOREIGN KEY (donation_form)
-    	REFERENCES hoa_files(file_id),
-    FOREIGN KEY (accepting_officer)
-    	REFERENCES hoa_officer(officer_id)
+CREATE TABLE IF NOT EXISTS donation (
+    donation_id 	  INT NOT NULL,
+    donor_firstname   VARCHAR(45) NOT NULL,
+    donor_middlename  VARCHAR(45) NOT NULL,
+    donor_lastname 	  VARCHAR(45) NOT NULL,
+    donor_type 		  ENUM('R','NR') NOT NULL,
+    donor_address 	  INT NOT NULL,
+    donation_date 	  DATE NOT NULL,
+    donation_form 	  INT NOT NULL,
+    status 			  ENUM('Existing','Deleted') NOT NULL,
+    accepting_officer INT(5) NOT NULL,
+    INDEX 			  (donation_id ASC),
+	INDEX 			  (donor_firstname ASC),
+    INDEX 			  (donor_lastname ASC),
+    INDEX			  (donor_type ASC),
+    INDEX 			  (donation_date ASC),
+    INDEX 			  (status ASC),
+    INDEX 			  (accepting_officer ASC),
+    PRIMARY KEY 	  (donation_id),
+    FOREIGN KEY 	  (donation_address)
+		REFERENCES 	  address(address_id),
+	FOREIGN KEY 	  (donation_form)
+    	REFERENCES 	  hoa_files(file_id),
+    FOREIGN KEY 	  (accepting_officer)
+    	REFERENCES 	  hoa_officer(officer_id)
 );
+
 -- -----------------------------------------------------
 -- Table donation_item
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS donation_item;
-CREATE TABLE IF NOT EXISTS donation_item
-(
+CREATE TABLE IF NOT EXISTS donation_item (
     donation_itemid INT NOT NULL,
-    amount DECIMAL(10,2) NOT NULL,
-    description VARCHAR(255) NOT NULL,
-    donation_id INT NOT NULL,
-
-    PRIMARY KEY (donation_itemid),
-    
-    INDEX (donation_id ASC),
-
-    FOREIGN KEY(donation_id)
-    	REFERENCES donation(donation_id)
+    amount 			DECIMAL(10,2) NOT NULL,
+    description 	VARCHAR(255) NOT NULL,
+    donation_id 	INT NOT NULL,
+    INDEX			(donation_itemid ASC),
+	INDEX 			(donation_id ASC),
+    PRIMARY KEY 	(donation_itemid),
+    FOREIGN KEY		(donation_id)
+    	REFERENCES 	donation(donation_id)
 );
+
 -- -----------------------------------------------------
 -- Table donation_picture
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS donation_picture;
-CREATE TABLE IF NOT EXISTS donation_picture
-(
+CREATE TABLE IF NOT EXISTS donation_picture (
     donation_pictureid INT NOT NULL,
-    picture BLOB NOT NULL,
-    donation_id INT NOT NULL,
-
-    PRIMARY KEY (donation_pictureid),
-
-    INDEX (donation_id ASC),
-
-    FOREIGN KEY (donation_id)
-    	REFERENCES donation(donation_id)
+    picture 		   BLOB NOT NULL,
+    donation_id 	   INT NOT NULL,
+    INDEX 			   (donation_pictureid ASC),
+    INDEX 			   (donation_id ASC),
+    PRIMARY KEY 	   (donation_pictureid),
+    FOREIGN KEY 	   (donation_id)
+    	REFERENCES 	   donation(donation_id)
 );
+
 -- -----------------------------------------------------
 -- Add records to regions
 -- -----------------------------------------------------

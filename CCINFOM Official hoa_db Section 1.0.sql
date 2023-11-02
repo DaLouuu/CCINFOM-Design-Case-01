@@ -583,23 +583,114 @@ CREATE TABLE IF NOT EXISTS evidence (
 -- -----------------------------------------------------
 -- Table incentives_anddiscounts
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS incentives_anddiscounts;
+CREATE TABLE IF NOT EXISTS incentives_anddiscounts
+(
+    incentives_anddiscounts_id INT NOT NULL,
+    bill_period INT NOT NULL,
+    awarded_resident INT NOT NULL,
+    classification ENUM('I','D') NOT NULL,
+    amount_orrate DECIMAL(10,2) NOT NULL,
+    reason VARCHAR(45),
+    authorizing_officer INT(5) NOT NULL,
 
+    PRIMARY KEY(incentives_anddiscounts_id),
+
+    INDEX (awarded_resident ASC),
+    INDEX (bill_period ASC),
+
+    FOREIGN KEY(bill_period)
+	REFERENCES monthly_duebill(monthly_duebillid),
+    FOREIGN KEY(awarded_resident)
+        REFERENCES resident(resident_id),
+    FOREIGN KEY(authorizing_officer)
+        REFERENCES hoa_officer(officer_id)
+    
+);
 -- -----------------------------------------------------
 -- Table nonmonetary_incentives
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS nonmonetary_incentives;
+CREATE TABLE IF NOT EXISTS nonmonetary_incentives
+(
+    incentive_id INT NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    validity_startdate DATE NOT NULL,
+    validity_enddate DATE NOT NULL,
+    status ENUM('Valid','Expired','Availed','Cancelled') NOT NULL, --'Availed' should really be either 'Claimed' or 'Applied' but whatever. 'Availed <some offer>' is a common mistake - 'Availed OF <some offer> is the grammatically correct form.
+    reason VARCHAR(45) NOT NULL,
+    authorizing_officer INT(5) NOT NULL,
+    awarded_resident INT(5) NOT NULL,
 
+    PRIMARY KEY(incentive_id),
+
+    INDEX (awarded_resident ASC),
+
+    FOREIGN KEY(authorizing_officer)
+    	REFERENCES hoa_officer(officer_id),
+    FOREIGN KEY(awarded_resident) 
+    	REFERENCES resident(resident_id)
+);
 -- -----------------------------------------------------
 -- Table donation
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS donation;
+CREATE TABLE IF NOT EXISTS donation
+(
+    donation_id INT NOT NULL,
+    donor_name VARCHAR(45) NOT NULL,
+    donor_type ENUM('R','NR') NOT NULL,
+    donor_address VARCHAR(45) NOT NULL,
+    donation_date DATE NOT NULL,
+    donation_form INT NOT NULL,
+    status ENUM('E','D') INT NOT NULL,
+    accepting_officer INT NOT NULL,
 
+    PRIMARY KEY (donation_id),
+
+    INDEX (donor_name ASC),
+    INDEX (accepting_officer ASC),
+
+    FOREIGN KEY (donation_form)
+    	REFERENCES hoa_files(file_id),
+    FOREIGN KEY (accepting_officer)
+    	REFERENCES hoa_officer(officer_id)
+);
+-- -----------------------------------------------------
+-- Table donation_item
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS donation_item;
+CREATE TABLE IF NOT EXISTS donation_item
+(
+    donation_itemid INT NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    donation_id INT NOT NULL,
+
+    PRIMARY KEY (donation_itemid),
+    
+    INDEX (donation_id ASC),
+
+    FOREIGN KEY(donation_id)
+    	REFERENCES donation(donation_id)
+);
 -- -----------------------------------------------------
 -- Table donation_picture
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS donation_picture;
+CREATE TABLE IF NOT EXISTS donation_picture
+(
+    donation_pictureid INT NOT NULL,
+    picture BLOB NOT NULL,
+    donation_id INT NOT NULL,
 
--- -----------------------------------------------------
--- Table donation_id
--- -----------------------------------------------------
+    PRIMARY KEY (donation_pictureid),
 
+    INDEX (donation_id ASC),
+
+    FOREIGN KEY (donation_id)
+    	REFERENCES donation(donation_id)
+);
 -- -----------------------------------------------------
 -- Add records to regions
 -- -----------------------------------------------------

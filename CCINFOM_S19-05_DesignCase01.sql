@@ -393,7 +393,7 @@ DROP TABLE IF EXISTS hoaofficer_sched;
 CREATE TABLE IF NOT EXISTS hoaofficer_sched (
   officer_id	INT(5) NOT NULL,
   sched_time	ENUM('AM', 'PM') NOT NULL,
-  avail_Mon		TINYINT(1) NOT NULL, -- 0 is not a null value
+  avail_Mon		TINYINT(1) NOT NULL, 
   avail_Tue		TINYINT(1) NOT NULL,
   avail_Wed		TINYINT(1) NOT NULL,
   avail_Thu		TINYINT(1) NOT NULL,
@@ -478,22 +478,7 @@ CREATE TABLE IF NOT EXISTS monthly_duebill (
   FOREIGN KEY 		 (household_id)
 	REFERENCES 		 household(household_id)
 );
--- Example bill report
-/*
-SELECT 	m.monthly_duebillid,
-		m.household_id,
-        m.date_generated,
-		(SUM(d.due_amount) + SUM(pi.penalty_imposed) + 5000.00) AS 'deduction_amount',
-		SUM(pi.penalty_imposed) AS 'penalty_amount',
-        ha.outstanding_balance AS 'unpaid_dues',
-        (ha.outstanding_balance - deduction_amount) AS 'total_amount"
-FROM monthly_duebill m LEFT JOIN dues d ON m.household_id = d.household_id AND (MONTH(d.date_incurred) = MONTH(m.date_generated) AND YEAR(d.date_incurred) = YEAR(m.date_generated))
-            LEFT JOIN household_account ha ON d.household_id = ha.household_id 
-			LEFT JOIN residents r ON r.household_id = ha.household_id
-            LEFT JOIN incentives_anddiscounts i ON i.awarded_resident = r.resident_id AND i.bill_period = m.monthly_duebillid
-            LEFT JOIN person_involved pi ON pi.resident_id = r.resident_id AND (MONTH(pi.date) = MONTH(m.date_generated) AND YEAR(pi.date) = 2023)
 
-*/
 -- -----------------------------------------------------
 -- Table dues
 -- -----------------------------------------------------
@@ -514,7 +499,7 @@ CREATE TABLE IF NOT EXISTS dues
 -- Table household_account
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS household_account;
-CREATE TABLE IF NOT EXISTS household_account -- Kept separate from household table for security purposes
+CREATE TABLE IF NOT EXISTS household_account
 (
 	household_id INT NOT NULL,
     outstanding_balance DECIMAL(10,2) NOT NULL, 
@@ -539,7 +524,7 @@ CREATE TABLE IF NOT EXISTS payments (
   or_number 		VARCHAR(5) NOT NULL,
   payment_date 		DATE NOT NULL,
   amount_paid 		DECIMAL(10,2) NOT NULL,
-  paying_resident 	INT(5) NOT NULL, -- retrieve household ID
+  paying_resident 	INT(5) NOT NULL, 
   receiving_officer INT(5) NOT NULL,
   INDEX 			(or_number ASC),
   INDEX 			(payment_date ASC),
@@ -584,7 +569,7 @@ CREATE TABLE IF NOT EXISTS person_involved (
   middle_name 		VARCHAR(45) NOT NULL,
   last_name 		VARCHAR(45) NOT NULL,
   pi_type 			ENUM('R','NR') NOT NULL,
-  penalty_imposed 	DECIMAL(10,2) NOT NULL, -- may be 0
+  penalty_imposed 	DECIMAL(10,2) NOT NULL, 
   resident_id		INT NULL,
   incident_id 		INT NOT NULL,
   INDEX 			(person_involvedid ASC),
@@ -833,7 +818,7 @@ INSERT INTO	homeowner
 			(30012, 12, 1, 1, 1, 10000022, NULL, NULL, 'Animo HOA', 2023202412),
 			(30013, 10, 1, 1, 1, 10000023, NULL, NULL, 'Animo HOA', 2023202414),
             (30014, 6, 1, 1, 1, 10000024, NULL, NULL, 'Animo HOA', 2023202415),
-            (30015, 15, 1, 1, 1, 10000025, NULL, NULL, 'Animo HOA', 2023202416), -- new starting from here
+            (30015, 15, 1, 1, 1, 10000025, NULL, NULL, 'Animo HOA', 2023202416),
             (30016, 16, 1, 1, 1, 10000026, NULL, NULL, 'Animo HOA', 2023202417);
 
 -- -----------------------------------------------------
@@ -860,7 +845,7 @@ INSERT INTO	elections
 INSERT INTO	hoa_officer
 	VALUES	(99901, 30012, 'President', '2023-01-09','2024-01-07','2022-11-26'),
 			(99902, 30013, 'Secretary', '2023-01-09','2024-01-07','2022-11-26'),
-            (99903, 30014, 'Treasurer', '2023-01-09', '2024-01-07', '2022-11-26'), -- new starting from here
+            (99903, 30014, 'Treasurer', '2023-01-09', '2024-01-07', '2022-11-26'), 
 			(99904, 30015, 'Vice-President', '2023-01-09', '2024-01-07', '2022-11-26'),
 			(99905, 30016, 'Auditor', '2023-01-09', '2024-01-07', '2022-11-26');
 
@@ -900,7 +885,7 @@ INSERT INTO	household
 			(42002),
 			(42003),
             (42004),
-            (42005), -- new starting from here
+            (42005), 
 			(42006),
 			(42007),
 			(42008),
@@ -915,7 +900,7 @@ INSERT INTO	resident
             (40013, 0, 'homeowner', 1, 42002, 1, 2023202412),
             (40014, 1, 'none', 1, 42003, 0, 2023202413),
             (40015, 0, 'homeowner', 1, 42004, 1, 2023202414),
-            (40016, 1, 'none', 1, 42005, 0, 2023202415), -- new starting from here
+            (40016, 1, 'none', 1, 42005, 0, 2023202415), 
 			(40017, 0, 'homeowner', 1, 42006, 1, 2023202416),
 			(40018, 0, 'none', 1, 42007, 1, 2023202417),
 			(40019, 1, 'none', 1, 42008, 0, 2023202418);
@@ -935,7 +920,7 @@ INSERT INTO	resident_idcard
 	VALUES	('ANIMO22001', '2022-01-30', 'New ID', '2022-02-04', 99902, NULL, 0.00, 'Active', 40013),
 			('ANIMO22002', '2022-02-20-', 'New ID', '2022-02-04-', 99902, NULL, 0.00, 'Active', 40011),
             ('ANIMO22003', '2022-02-20', 'New ID', '2022-02-04', 99902, NULL, 0.00, 'Active', 40012),
-            ('ANIMO22004', '2022-03-15', 'New ID', '2022-03-20', 99902, NULL, 0.00, 'Active', 40014), -- new starting from here
+            ('ANIMO22004', '2022-03-15', 'New ID', '2022-03-20', 99902, NULL, 0.00, 'Active', 40014), 
 			('ANIMO22005', '2022-03-25', 'New ID', '2022-03-30', 99902, NULL, 0.00, 'Active', 40015);
 
 -- -----------------------------------------------------
@@ -1004,7 +989,7 @@ INSERT INTO	residential_prop
 -- Add records to monthly_duebill
 -- -----------------------------------------------------
 	INSERT INTO	monthly_duebill
-	VALUES	(10001, '2023-11-01', 42001), -- new starting from here
+	VALUES	(10001, '2023-11-01', 42001), 
 			(10002, '2023-11-01', 42002),
 			(10003, '2023-11-01', 42003),
 			(10004, '2023-11-01', 42004),
@@ -1019,7 +1004,7 @@ INSERT INTO	residential_prop
 -- Add records to payments
 -- -----------------------------------------------------
 INSERT INTO	payments
-	VALUES	('PMT01', '2023-11-05', 580.00, 40011, 99901), -- new starting from here
+	VALUES	('PMT01', '2023-11-05', 580.00, 40011, 99901),
 			('PMT02', '2023-11-05', 585.00, 40012, 99902),
 			('PMT03', '2023-11-05', 545.00, 40013, 99903),
 			('PMT04', '2023-11-05', 625.00, 40014, 99904),
@@ -1031,7 +1016,7 @@ INSERT INTO	payments
 -- -----------------------------------------------------
 -- Add records to household_account
 -- -----------------------------------------------------
-INSERT INTO household_account -- Household ID and outstanding balance
+INSERT INTO household_account 
 	VALUES (42001, 0.0),
 		   (42002, -300.0),
            (42003, 1000.0), 
@@ -1059,7 +1044,7 @@ INSERT INTO dues
 -- Add records to incident
 -- -----------------------------------------------------
 INSERT INTO	incident
-	VALUES	(30001, '2023-01-15', 'Noise Complaint', 1, 99901, 99902), -- new starting from here
+	VALUES	(30001, '2023-01-15', 'Noise Complaint', 1, 99901, 99902), 
 			(30002, '2023-02-02', 'Unauthorized Parking', 2, 99902, 99901),
 			(30003, '2023-02-10', 'Trash Disposal Violation', 3, 99901, 99902),
 			(30004, '2023-02-20', 'Pet Policy Violation', 4, 99902, 99901),
@@ -1074,7 +1059,7 @@ INSERT INTO	incident
 -- Add records to person_involved
 -- -----------------------------------------------------
 INSERT INTO	person_involved
-	VALUES	(35001, 'Juan', 'R', 'Dela Cruz', 'R', 50.00, 40011, 30001), -- new starting from here
+	VALUES	(35001, 'Juan', 'R', 'Dela Cruz', 'R', 50.00, 40011, 30001), 
 			(35002, 'Juanita', 'G', 'Dela Cruz', 'R', 30.00, 40012, 30002),
 			(35003, 'Jose', 'P', 'Rizal', 'R', 30.00, 40013, 30002),
 			(35004, 'Andres', 'A', 'Bonifacio', 'R', 20.00, 40014, 30003),
@@ -1089,7 +1074,7 @@ INSERT INTO	person_involved
 -- Add records to evidence
 -- -----------------------------------------------------
 INSERT INTO	evidence
-	VALUES	(50001, 'Picture of Graffiti', 'Picture of graffiti found on building wall', 'graffiti.jpg', 40011, 99901, '2023-01-15', 30001), -- new starting from here
+	VALUES	(50001, 'Picture of Graffiti', 'Picture of graffiti found on building wall', 'graffiti.jpg', 40011, 99901, '2023-01-15', 30001), 
 			(50002, 'Unauthorized Parking Vehicle', 'Picture of unauthorized vehicle parked in restricted area', 'parking.jpg', 40013, 99902, '2023-01-16', 30002),
 			(50003, 'Trash Bags in Common Area', 'Picture of trash bags left in common area', 'trash.jpg', 40011, 99901, '2023-01-17', 30003),
 			(50004, 'Unauthorized Pet in Premises', 'Picture of unauthorized pet inside the building', 'pet.jpg', 40014, 99902, '2023-01-18', 30004),
@@ -1099,7 +1084,7 @@ INSERT INTO	evidence
 -- Add records to incentives_anddiscounts
 -- -----------------------------------------------------
 INSERT INTO	incentives_anddiscounts
-	VALUES	(70001, 10001, 40011, 'I', 20.00, 'Exemplary Behavior', 99901), -- new starting from here
+	VALUES	(70001, 10001, 40011, 'I', 20.00, 'Exemplary Behavior', 99901), 
 			(70002, 10002, 40012, 'D', 10.00, 'Early Payment', 99902),
 			(70003, 10003, 40013, 'I', 15.00, 'Loyalty Reward', 99901),
 			(70004, 10004, 40014, 'D', 5.00, 'Neighborly Support', 99902),
@@ -1114,7 +1099,7 @@ INSERT INTO	incentives_anddiscounts
 -- Add records to nonmonetary_incentives
 -- -----------------------------------------------------
 INSERT INTO	nonmonetary_incentives
-	VALUES	(80011, 'Free Art Workshop Pass', '2023-01-01', '2023-12-31', 'Valid', 'Creative Skill Development Program', 99901, 40011), -- new starting from here
+	VALUES	(80011, 'Free Art Workshop Pass', '2023-01-01', '2023-12-31', 'Valid', 'Creative Skill Development Program', 99901, 40011),
 			(80012, 'Community Clean-up Initiative', '2023-01-15', '2023-12-31', 'Expired', 'Neighborhood Cleanup Drive', 99902, 40012),
 			(80013, 'Gardening Workshop Access', '2023-02-01', '2023-12-31', 'Valid', 'Green Thumb Workshop Series', 99901, 40013),
 			(80014, 'Complimentary Yoga Classes', '2023-02-15', '2023-12-31', 'Availed', 'Holistic Health Program', 99902, 40014),
@@ -1129,7 +1114,7 @@ INSERT INTO	nonmonetary_incentives
 -- Add records to donation
 -- -----------------------------------------------------
 INSERT INTO	donation
-	VALUES	(60001, 'Juan', '', 'Dela Cruz', 'R', 10000020, '2023-01-05', 555556663, 'Existing', 99901), -- new starting from here
+	VALUES	(60001, 'Juan', '', 'Dela Cruz', 'R', 10000020, '2023-01-05', 555556663, 'Existing', 99901),
             (60002, 'Juanita', '', 'Dela Cruz', 'R', 10000021, '2023-01-10', 555556662, 'Deleted', 99902),
             (60003, 'Jose', '', 'Rizal', 'R', 10000022, '2023-01-15', 555556678, 'Existing', 99902),
             (60004, 'Andres', '', 'Bonifacio', 'R', 10000023, '2023-02-01', 555556677, 'Existing', 99901),
@@ -1141,7 +1126,7 @@ INSERT INTO	donation
 -- Add records to donation_picture
 -- -----------------------------------------------------
 INSERT INTO	donation_picture
-	VALUES	(62001, 'receipt_2023.jpg', 60001), -- new starting from here
+	VALUES	(62001, 'receipt_2023.jpg', 60001), 
             (62002, 'thank_you_note.jpg', 60002),
             (62003, 'certificate_of_appreciation.jpg', 60002),
             (62004, 'donor_group_photo.jpg', 60002),
@@ -1153,7 +1138,7 @@ INSERT INTO	donation_picture
 -- Add records to donation_item
 -- -----------------------------------------------------
 INSERT INTO	donation_item
-	VALUES	(65001, 100.00, 'Cash donation for school supplies', 60001), -- new starting from here
+	VALUES	(65001, 100.00, 'Cash donation for school supplies', 60001), 
             (65002, 250.00, 'Food donation for community event', 60002),
             (65003, 150.00, 'Clothing donation for winter drive', 60003),
             (65004, 500.00, 'Cash donation for medical expenses', 60004),

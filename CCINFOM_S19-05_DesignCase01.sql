@@ -559,9 +559,9 @@ DROP TABLE IF EXISTS evidence;
 CREATE TABLE IF NOT EXISTS evidence (
   evidence_id 		  INT NOT NULL,
   name 				  VARCHAR(45) NOT NULL,
-  description 		  VARCHAR(45) NOT NULL,
+  description 		  VARCHAR(255) NOT NULL,
   file_name 		  VARCHAR(45) NOT NULL,
-  submitting_resident ENUM('R','NR') NOT NULL,
+  submitting_resident INT NOT NULL,
   accepting_officer   INT NOT NULL,
   date_submitted 	  DATE NOT NULL,
   incident_id 		  INT NOT NULL,
@@ -655,7 +655,7 @@ CREATE TABLE IF NOT EXISTS donation (
     INDEX 			  (status ASC),
     INDEX 			  (accepting_officer ASC),
     PRIMARY KEY 	  (donation_id),
-    FOREIGN KEY 	  (donation_address)
+    FOREIGN KEY 	  (donor_address)
 		REFERENCES 	  address(address_id),
 	FOREIGN KEY 	  (donation_form)
     	REFERENCES 	  hoa_files(file_id),
@@ -753,7 +753,8 @@ INSERT INTO	address
 			(10000022, '77', 'Benilde St.', '680', 'Manila', 'Metro Manila', 1001, 567.8901, 678.9101),
             (10000023, '13', 'Mutien-Marie St.', '680', 'Manila', 'Metro Manila', 1001, 789.1011, 891.0111),
             (10000024, '50', 'Green Archer St.', '780', 'Manila', 'Metro Manila', 1002, 910.1112, 101.1121),
-            (10000025, '11', 'Reims St.', '780', 'Manila', 'Metro Manila', 1002, 131.4151, 617.1819);
+            (10000025, '11', 'Reims St.', '780', 'Manila', 'Metro Manila', 1002, 131.4151, 617.1819),
+            (10000026, '11', 'Reims St.', '780', 'Manila', 'Metro Manila', 1002, 131.4151, 617.1819);
 
 -- -----------------------------------------------------
 -- Add records to hoa
@@ -772,8 +773,10 @@ INSERT INTO	individual
 			(2023202412, 'Rizal', 'Jose', 'P', 'joserizal@gmail.com', '1961-06-19', 'M', 'jprizal', 'pic3.jpg', 'HR'),
 			(2023202413, 'Bonifacio', 'Andres', 'A', 'andresbonifacio@gmail.com', '1983-11-30', 'M', NULL, 'pic4.jpg', 'R'),
 			(2023202414, 'Silang', 'Gabriela', 'R', 'gabrielasilang@gmail.com', '1991-03-19', 'F', 'grsilang', 'pic5.jpg', 'HR'),
-			(2023202415, 'Luna', 'Juan', 'M', 'juanluna@gmail.com', '1991-03-19', 'M', 'jluna', 'pic5.jpg', 'H');
-
+			(2023202415, 'Luna', 'Juan', 'M', 'juanluna@gmail.com', '1991-03-19', 'M', 'jluna', 'pic5.jpg', 'H'),
+			(2023202416, 'Aguinaldo', 'Emilio', ' ', 'eaguinaldo@yahoo.com', '1969-03-22', 'M', 'eaguin', 'pic6.jpg','HR'),
+			(2023202417, 'Felipe', 'Julian', 'R', 'julian_felipe@hotmail.com', '1969-01-28', 'M', NULL, 'pic7.jpg','H'),
+            (2023202418, 'Agoncillo', 'Lorenza', 'M', 'flagoncillo@gmail.com', '1990-09-05', 'F', 'loragoncillo', 'pic6.jpg','R');
 -- -----------------------------------------------------
 -- Add records to homeowner
 -- -----------------------------------------------------
@@ -866,9 +869,8 @@ INSERT INTO	resident
             (40015, 0, 'homeowner', 1, 42004, 1, 2023202414),
             (40016, 1, 'none', 1, 42005, 0, 2023202415), -- new starting from here
 			(40017, 0, 'homeowner', 1, 42006, 1, 2023202416),
-			(40018, 0, 'homeowner', 1, 42007, 1, 2023202417),
-			(40019, 1, 'none', 1, 42008, 0, 2023202418),
-			(40020, 0, 'homeowner', 1, 42009, 1, 2023202419);
+			(40018, 0, 'none', 1, 42007, 1, 2023202417),
+			(40019, 1, 'none', 1, 42008, 0, 2023202418);
 
 -- -----------------------------------------------------
 -- Add records to receipt
@@ -977,8 +979,7 @@ INSERT INTO	payments
 			('PMT06', '2023-11-05', 535.00, 40016, 99903), 
 			('PMT07', '2023-11-05', 480.00, 40017, 99904), 
 			('PMT08', '2023-11-05', 490.00, 40018, 99905), 
-			('PMT09', '2023-11-05', 470.00, 40019, 99901), 
-			('PMT10', '2023-11-05', 510.00, 40020, 99902);
+			('PMT09', '2023-11-05', 470.00, 40019, 99901);
 
 -- -----------------------------------------------------
 -- Add records to incident
@@ -1014,11 +1015,11 @@ INSERT INTO	person_involved
 -- Add records to evidence
 -- -----------------------------------------------------
 INSERT INTO	evidence
-	VALUES	(50001, 'Picture of Graffiti', 'Picture of graffiti found on building wall', 'graffiti.jpg', 'R', 99901, '2023-01-15', 30001), -- new starting from here
-			(50002, 'Unauthorized Parking Vehicle', 'Picture of unauthorized vehicle parked in restricted area', 'parking.jpg', 'NR', 99902, '2023-01-16', 30002),
-			(50003, 'Trash Bags in Common Area', 'Picture of trash bags left in common area', 'trash.jpg', 'R', 99901, '2023-01-17', 30003),
-			(50004, 'Unauthorized Pet in Premises', 'Picture of unauthorized pet inside the building', 'pet.jpg', 'NR', 99902, '2023-01-18', 30004),
-			(50005, 'Noise Complaint Audio Clip', 'Audio clip recording of loud party complaint', 'noise.wav', 'R', 99901, '2023-01-19', 30005);
+	VALUES	(50001, 'Picture of Graffiti', 'Picture of graffiti found on building wall', 'graffiti.jpg', 40011, 99901, '2023-01-15', 30001), -- new starting from here
+			(50002, 'Unauthorized Parking Vehicle', 'Picture of unauthorized vehicle parked in restricted area', 'parking.jpg', 40013, 99902, '2023-01-16', 30002),
+			(50003, 'Trash Bags in Common Area', 'Picture of trash bags left in common area', 'trash.jpg', 40011, 99901, '2023-01-17', 30003),
+			(50004, 'Unauthorized Pet in Premises', 'Picture of unauthorized pet inside the building', 'pet.jpg', 40014, 99902, '2023-01-18', 30004),
+			(50005, 'Noise Complaint Audio Clip', 'Audio clip recording of loud party complaint', 'noise.wav', 40012, 99901, '2023-01-19', 30005);
     
 -- -----------------------------------------------------
 -- Add records to incentives_anddiscounts
@@ -1054,16 +1055,13 @@ INSERT INTO	nonmonetary_incentives
 -- Add records to donation
 -- -----------------------------------------------------
 INSERT INTO	donation
-	VALUES	(60001, 'Juan', '', 'Dela Cruz', 'R', 10000020, '2023-01-05', 555556664, 'Existing', 99901), -- new starting from here
-            (60002, 'Juanita', '', 'Dela Cruz', 'R', 10000021, '2023-01-10', 555556665, 'Deleted', 99902),
-            (60003, 'Jose', '', 'Rizal', 'R', 10000022, '2023-01-15', 555556666, 'Existing', 99902),
-            (60004, 'Andres', '', 'Bonifacio', 'R', 10000023, '2023-02-01', 555556667, 'Existing', 99901),
-            (60005, 'Gabriela', '', 'Silang', 'R', 10000024, '2023-02-05', 555556668, 'Existing', 99902),
+	VALUES	(60001, 'Juan', '', 'Dela Cruz', 'R', 10000020, '2023-01-05', 555556663, 'Existing', 99901), -- new starting from here
+            (60002, 'Juanita', '', 'Dela Cruz', 'R', 10000021, '2023-01-10', 555556662, 'Deleted', 99902),
+            (60003, 'Jose', '', 'Rizal', 'R', 10000022, '2023-01-15', 555556678, 'Existing', 99902),
+            (60004, 'Andres', '', 'Bonifacio', 'R', 10000023, '2023-02-01', 555556677, 'Existing', 99901),
+            (60005, 'Gabriela', '', 'Silang', 'R', 10000024, '2023-02-05', 555556670, 'Existing', 99902),
             (60006, 'Juan', '', 'Luna', 'R', 10000025, '2023-02-10', 555556669, 'Existing', 99901),
-            (60007, 'Carlos', '', 'Garcia', 'NR', 10000026, '2023-02-15', 555556670, 'Deleted', 99902),
-            (60008, 'Melchora', '', 'Aquino', 'NR', 10000027, '2023-03-01', 555556671, 'Existing', 99901),
-            (60009, 'Gregorio', '', 'Del Pilar', 'NR', 10000028, '2023-03-05', 555556672, 'Existing', 99902),
-            (60010, 'Francisco', '', 'Balagtas', 'NR', 10000029, '2023-03-10', 555556673, 'Existing', 99901);
+            (60007, 'Carlos', '', 'Garcia', 'NR', 10000026, '2023-02-15', 555556670, 'Deleted', 99902);
 
 -- -----------------------------------------------------
 -- Add records to donation_picture
@@ -1075,10 +1073,7 @@ INSERT INTO	donation_picture
             (62004, 'donor_group_photo.jpg', 60002),
             (62005, 'donation_event_snapshot.jpg', 60005),
             (62006, 'donation_received.jpg', 60006),
-            (62007, 'donor_thank_you_card.jpg', 60007),
-            (62008, 'donation_process.jpg', 60008),
-            (62009, 'donor_certificate.jpg', 60009),
-            (62010, 'donor_appreciation.jpg', 60010);
+            (62007, 'donor_thank_you_card.jpg', 60007);
 
 -- -----------------------------------------------------
 -- Add records to donation_item
@@ -1091,7 +1086,4 @@ INSERT INTO	donation_item
             (65005, 300.00, 'Toy donation for children in need', 60005),
             (65006, 200.00, 'Book donation for local library', 60006),
             (65007, 350.00, 'Cash donation for disaster relief', 60007),
-            (65008, 400.00, 'Non-perishable food donation', 60008),
-            (65009, 120.00, 'School book donation for underprivileged students', 60009),
-            (65010, 180.00, 'Cash donation for animal shelter', 60010),
             (65011, 220.00, 'Clothing donation for local shelter', 60001);

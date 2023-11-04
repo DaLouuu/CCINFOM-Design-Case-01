@@ -493,7 +493,7 @@ CREATE TABLE IF NOT EXISTS payments (
   payment_date 		DATE NOT NULL,
   amount_paid 		DECIMAL(10,2) NOT NULL,
   paying_resident 	INT(5) NOT NULL,
-  receiving_officer INT(5),
+  receiving_officer INT(5) NOT NULL,
   INDEX 			(or_number ASC),
   INDEX 			(payment_date ASC),
   INDEX 			(paying_resident ASC),
@@ -969,16 +969,16 @@ INSERT INTO	monthly_duebill
 -- Add records to payments
 -- -----------------------------------------------------
 INSERT INTO	payments
-	VALUES	(20001, '2023-11-05', 580.00, 'Full Payment', 10001), -- new starting from here
-			(20002, '2023-11-05', 585.00, 'Full Payment', 10002),
-			(20003, '2023-11-05', 545.00, 'Full Payment', 10003),
-			(20004, '2023-11-05', 625.00, 'Full Payment', 10004),
-			(20005, '2023-11-05', 650.00, 'Full Payment', 10005),
-			(20006, '2023-11-05', 535.00, 'Full Payment', 10006),
-			(20007, '2023-11-05', 480.00, 'Full Payment', 10007),
-			(20008, '2023-11-05', 490.00, 'Full Payment', 10008),
-			(20009, '2023-11-05', 470.00, 'Full Payment', 10009),
-			(20010, '2023-11-05', 510.00, 'Full Payment', 10010);
+	VALUES	('PMT01', '2023-11-05', 580.00, 40011, 99901), -- new starting from here
+			('PMT02', '2023-11-05', 585.00, 40012, 99902),
+			('PMT03', '2023-11-05', 545.00, 40013, 99903),
+			('PMT04', '2023-11-05', 625.00, 40014, 99904),
+			('PMT05', '2023-11-05', 650.00, 40015, 99905),
+			('PMT06', '2023-11-05', 535.00, 40016, 99903), 
+			('PMT07', '2023-11-05', 480.00, 40017, 99904), 
+			('PMT08', '2023-11-05', 490.00, 40018, 99905), 
+			('PMT09', '2023-11-05', 470.00, 40019, 99901), 
+			('PMT10', '2023-11-05', 510.00, 40020, 99902);
 
 -- -----------------------------------------------------
 -- Add records to incident

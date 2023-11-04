@@ -1031,7 +1031,7 @@ INSERT INTO	payments
 -- -----------------------------------------------------
 -- Add records to household_account
 -- -----------------------------------------------------
-INSERT INTO household_account -- Household ID and account balance
+INSERT INTO household_account -- Household ID and outstanding balance
 	VALUES (42001, 0.0),
 		   (42002, -300.0),
            (42003, 1000.0), 
@@ -1042,6 +1042,19 @@ INSERT INTO household_account -- Household ID and account balance
            (42008, -1200.0),
            (42009, 5.5),
            (42010, 9.0);
+-- -----------------------------------------------------
+-- Add records to dues
+-- -----------------------------------------------------
+INSERT INTO dues
+	VALUES (111222, 'Penalty', 2000.00, '2023-11-05', 42001),
+		   (111223, 'Property damage', 100.00, '2023-11-02', 42002),
+           (111224, 'Property damage', 100.00, '2023-11-02', 42005),
+           (111225, 'Penalty', 1300.00, '2023-11-10', 42009),
+           (111226, 'Basic', 100.00, '2023-11-02', 42002),
+           (111227, 'Asset rehab', 100.00, '2023-11-06', 42004),
+           (111228, 'School bus service', 100.00, '2023-11-04', 42005),
+           (111229, 'Basic', 100.00, '2023-11-02', 42010),
+           (111230, 'Property damage', 100.00, '2023-11-02', 42006);
 -- -----------------------------------------------------
 -- Add records to incident
 -- -----------------------------------------------------

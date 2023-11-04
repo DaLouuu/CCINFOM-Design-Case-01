@@ -393,13 +393,13 @@ DROP TABLE IF EXISTS hoaofficer_sched;
 CREATE TABLE IF NOT EXISTS hoaofficer_sched (
   officer_id	INT(5) NOT NULL,
   sched_time	ENUM('AM', 'PM') NOT NULL,
-  avail_Mon		TINYINT(1) NULL,
-  avail_Tue		TINYINT(1) NULL,
-  avail_Wed		TINYINT(1) NULL,
-  avail_Thu		TINYINT(1) NULL,
-  avail_Fri		TINYINT(1) NULL,
-  avail_Sat		TINYINT(1) NULL,
-  avail_Sun		TINYINT(1) NULL,
+  avail_Mon		TINYINT(1) NOT NULL, -- 0 is not a null value
+  avail_Tue		TINYINT(1) NOT NULL,
+  avail_Wed		TINYINT(1) NOT NULL,
+  avail_Thu		TINYINT(1) NOT NULL,
+  avail_Fri		TINYINT(1) NOT NULL,
+  avail_Sat		TINYINT(1) NOT NULL,
+  avail_Sun		TINYINT(1) NOT NULL,
   PRIMARY KEY	(officer_id, sched_time),
   INDEX			(officer_id ASC),
   FOREIGN KEY	(officer_id)
@@ -470,11 +470,6 @@ DROP TABLE IF EXISTS monthly_duebill;
 CREATE TABLE IF NOT EXISTS monthly_duebill (
   monthly_duebillid  INT NOT NULL,
   date_generated 	 DATE NOT NULL,
-  deduction_amount 	 DECIMAL(10,2),
-  reg_monthlydue 	 DECIMAL(10,2) NOT NULL,
-  unpaid_pastdues 	 DECIMAL(10,2) NOT NULL,
-  total_amount 		 DECIMAL(10,2) NOT NULL,
-  penalties_incurred DECIMAL(10,2) NOT NULL,
   household_id 		 INT(5) NOT NULL,
   INDEX 			 (monthly_duebillid ASC),
   INDEX 			 (date_generated ASC),
@@ -483,7 +478,59 @@ CREATE TABLE IF NOT EXISTS monthly_duebill (
   FOREIGN KEY 		 (household_id)
 	REFERENCES 		 household(household_id)
 );
+-- Example bill report
+/*
+SELECT 	m.monthly_duebillid,
+		m.household_id,
+        m.date_generated,
+		(SUM(d.due_amount) + SUM(pi.penalty_imposed) + 5000.00) AS 'deduction_amount',
+		SUM(pi.penalty_imposed) AS 'penalty_amount',
+        ha.outstanding_balance AS 'unpaid_dues',
+        (ha.outstanding_balance - deduction_amount) AS 'total_amount"
+FROM monthly_duebill m LEFT JOIN dues d ON m.household_id = d.household_id AND (MONTH(d.date_incurred) = MONTH(m.date_generated) AND YEAR(d.date_incurred) = YEAR(m.date_generated))
+            LEFT JOIN household_account ha ON d.household_id = ha.household_id 
+			LEFT JOIN residents r ON r.household_id = ha.household_id
+            LEFT JOIN incentives_anddiscounts i ON i.awarded_resident = r.resident_id AND i.bill_period = m.monthly_duebillid
+            LEFT JOIN person_involved pi ON pi.resident_id = r.resident_id AND (MONTH(pi.date) = MONTH(m.date_generated) AND YEAR(pi.date) = 2023)
 
+*/
+-- -----------------------------------------------------
+-- Table dues
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS dues;
+CREATE TABLE IF NOT EXISTS dues 
+(
+	due_id INT NOT NULL,
+    due_desc VARCHAR(45) NOT NULL,
+    due_amount DECIMAL(10,2) NOT NULL,
+    date_incurred DATE NOT NULL,
+    household_id INT(5) NOT NULL,
+    
+    PRIMARY KEY (due_id),
+    FOREIGN KEY (household_id)
+		REFERENCES household(household_id)
+);
+-- -----------------------------------------------------
+-- Table household_account
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS household_account;
+CREATE TABLE IF NOT EXISTS household_account -- Kept separate from household table for security purposes
+(
+	household_id INT NOT NULL,
+    outstanding_balance DECIMAL(10,2) NOT NULL, 
+	/*
+    Last month's balance. If negative, there are unpaid dues.
+    If positive, this month's dues are first deducted from remaining balance.
+    Either way, this month's total amounts to outstanding_balance - sum of dues accumulated this month.
+    
+    Monthly due calculation (deduction_amount): sum of dues + sum of penalties.
+    Monthly balance calculation: outstanding balance - monthly dues.
+    */
+    
+    PRIMARY KEY (household_id),
+    FOREIGN KEY (household_id)
+		REFERENCES household(household_id)
+);
 -- -----------------------------------------------------
 -- Table payments
 -- -----------------------------------------------------
@@ -492,7 +539,7 @@ CREATE TABLE IF NOT EXISTS payments (
   or_number 		VARCHAR(5) NOT NULL,
   payment_date 		DATE NOT NULL,
   amount_paid 		DECIMAL(10,2) NOT NULL,
-  paying_resident 	INT(5) NOT NULL,
+  paying_resident 	INT(5) NOT NULL, -- retrieve household ID
   receiving_officer INT(5) NOT NULL,
   INDEX 			(or_number ASC),
   INDEX 			(payment_date ASC),
@@ -512,11 +559,9 @@ CREATE TABLE IF NOT EXISTS incident (
   incident_id 			INT NOT NULL,
   date 					DATE NOT NULL,
   description 			VARCHAR(255) NOT NULL,
-  penalty_imposed 		DECIMAL(10,2) NOT NULL,
   rulenum_violated 		INT NOT NULL,
   investigating_officer INT(5) NOT NULL,
   seconding_officer 	INT(5) NOT NULL,
-  resident_id 			INT(5) NOT NULL,
   INDEX 				(incident_id ASC),
   INDEX 				(date ASC),
   INDEX 				(rulenum_violated ASC),
@@ -526,9 +571,7 @@ CREATE TABLE IF NOT EXISTS incident (
   FOREIGN KEY 			(investigating_officer)
 	REFERENCES 			hoa_officer(officer_id),
   FOREIGN KEY 			(seconding_officer)
-	REFERENCES 			hoa_officer(officer_id),
-  FOREIGN KEY 			(resident_id)
-	REFERENCES 			resident(resident_id)
+	REFERENCES 			hoa_officer(officer_id)
 );
 
 -- -----------------------------------------------------
@@ -541,6 +584,8 @@ CREATE TABLE IF NOT EXISTS person_involved (
   middle_name 		VARCHAR(45) NOT NULL,
   last_name 		VARCHAR(45) NOT NULL,
   pi_type 			ENUM('R','NR') NOT NULL,
+  penalty_imposed 	DECIMAL(10,2) NOT NULL, -- may be 0
+  resident_id		INT NULL,
   incident_id 		INT NOT NULL,
   INDEX 			(person_involvedid ASC),
   INDEX 			(first_name ASC),
@@ -549,7 +594,10 @@ CREATE TABLE IF NOT EXISTS person_involved (
   INDEX 			(incident_id ASC),
   PRIMARY KEY 		(person_involvedid),
   FOREIGN KEY 		(incident_id)
-	REFERENCES 		incident(incident_id)
+	REFERENCES 		incident(incident_id),
+  FOREIGN KEY 		(resident_id)
+	REFERENCES 		resident(resident_id)
+  
 );
 
 -- -----------------------------------------------------
@@ -955,17 +1003,17 @@ INSERT INTO	residential_prop
 -- -----------------------------------------------------
 -- Add records to monthly_duebill
 -- -----------------------------------------------------
-INSERT INTO	monthly_duebill
-	VALUES	(10001, '2023-11-01', 100.00, 500.00, 50.00, 650.00, 10.00, 42001), -- new starting from here
-			(10002, '2023-11-01', 50.00, 450.00, 30.00, 530.00, 5.00, 42002),
-			(10003, '2023-11-01', 75.00, 480.00, 40.00, 595.00, 8.00, 42003),
-			(10004, '2023-11-01', 90.00, 520.00, 60.00, 670.00, 12.00, 42004),
-            (10005, '2023-11-01', 80.00, 480.00, 20.00, 580.00, 7.00, 42005),
-			(10006, '2023-11-01', 70.00, 490.00, 25.00, 585.00, 9.00, 42006),
-			(10007, '2023-11-01', 60.00, 470.00, 15.00, 545.00, 6.00, 42007),
-			(10008, '2023-11-01', 85.00, 510.00, 30.00, 625.00, 10.00, 42008),
-			(10009, '2023-11-01', 95.00, 520.00, 35.00, 650.00, 12.00, 42009),
-			(10010, '2023-11-01', 65.00, 460.00, 10.00, 535.00, 5.00, 42010);
+	INSERT INTO	monthly_duebill
+	VALUES	(10001, '2023-11-01', 42001), -- new starting from here
+			(10002, '2023-11-01', 42002),
+			(10003, '2023-11-01', 42003),
+			(10004, '2023-11-01', 42004),
+            (10005, '2023-11-01', 42005),
+			(10006, '2023-11-01', 42006),
+			(10007, '2023-11-01', 42007),
+			(10008, '2023-11-01', 42008),
+			(10009, '2023-11-01', 42009),
+			(10010, '2023-11-01', 42010);
     
 -- -----------------------------------------------------
 -- Add records to payments
@@ -980,36 +1028,49 @@ INSERT INTO	payments
 			('PMT07', '2023-11-05', 480.00, 40017, 99904), 
 			('PMT08', '2023-11-05', 490.00, 40018, 99905), 
 			('PMT09', '2023-11-05', 470.00, 40019, 99901);
-
+-- -----------------------------------------------------
+-- Add records to household_account
+-- -----------------------------------------------------
+INSERT INTO household_account -- Household ID and account balance
+	VALUES (42001, 0.0),
+		   (42002, -300.0),
+           (42003, 1000.0), 
+           (42004, -10.0),
+           (42005, 0.0),
+           (42006, 40.0),
+           (42007, 2000.0),
+           (42008, -1200.0),
+           (42009, 5.5),
+           (42010, 9.0);
 -- -----------------------------------------------------
 -- Add records to incident
 -- -----------------------------------------------------
 INSERT INTO	incident
-	VALUES	(30001, '2023-01-15', 'Noise Complaint', 50.00, 1, 99901, 99902, 40011), -- new starting from here
-			(30002, '2023-02-02', 'Unauthorized Parking', 30.00, 2, 99902, 99901, 40012),
-			(30003, '2023-02-10', 'Trash Disposal Violation', 20.00, 3, 99901, 99902, 40013),
-			(30004, '2023-02-20', 'Pet Policy Violation', 40.00, 4, 99902, 99901, 40014),
-			(30005, '2023-03-05', 'Loud Party Complaint', 60.00, 5, 99901, 99902, 40015),
-			(30006, '2023-03-12', 'Unauthorized Renovation', 70.00, 6, 99902, 99901, 40011),
-			(30007, '2023-04-01', 'Graffiti Found', 30.00, 7, 99901, 99902, 40012),
-			(30008, '2023-04-10', 'Pool Rule Violation', 40.00, 8, 99902, 99901, 40013),
-			(30009, '2023-04-25', 'Late Rent Payment', 50.00, 9, 99901, 99902, 40014),
-			(30010, '2023-05-02', 'Unauthorized Guest', 30.00, 10, 99902, 99901, 40015);
+	VALUES	(30001, '2023-01-15', 'Noise Complaint', 1, 99901, 99902), -- new starting from here
+			(30002, '2023-02-02', 'Unauthorized Parking', 2, 99902, 99901),
+			(30003, '2023-02-10', 'Trash Disposal Violation', 3, 99901, 99902),
+			(30004, '2023-02-20', 'Pet Policy Violation', 4, 99902, 99901),
+			(30005, '2023-03-05', 'Loud Party Complaint', 5, 99901, 99902),
+			(30006, '2023-03-12', 'Unauthorized Renovation', 6, 99902, 99901),
+			(30007, '2023-04-01', 'Graffiti Found', 7, 99901, 99902),
+			(30008, '2023-04-10', 'Pool Rule Violation', 8, 99902, 99901),
+			(30009, '2023-04-25', 'Late Rent Payment', 9, 99901, 99902),
+			(30010, '2023-05-02', 'Unauthorized Guest', 10, 99902, 99901);
 
 -- -----------------------------------------------------
 -- Add records to person_involved
 -- -----------------------------------------------------
 INSERT INTO	person_involved
-	VALUES	(35001, 'Juan', 'R', 'Dela Cruz', 'R', 30001), -- new starting from here
-			(35002, 'Juanita', 'G', 'Dela Cruz', 'NR', 30002),
-			(35003, 'Jose', 'P', 'Rizal', 'NR', 30002),
-			(35004, 'Andres', 'A', 'Bonifacio', 'R', 30003),
-			(35005, 'Gabriela', 'R', 'Silang', 'R', 30003),
-			(35006, 'Juan', 'M', 'Luna', 'NR', 30003),
-			(35007, 'John', 'R', 'Smith', 'NR', 30004),
-			(35008, 'Jane', 'G', 'Smith', 'NR', 30008),
-			(35009, 'Maria', 'P', 'Garcia', 'NR', 30009),
-			(35010, 'Carlos', 'A', 'Garcia', 'NR', 30010);
+	VALUES	(35001, 'Juan', 'R', 'Dela Cruz', 'R', 50.00, 40011, 30001), -- new starting from here
+			(35002, 'Juanita', 'G', 'Dela Cruz', 'R', 30.00, 40012, 30002),
+			(35003, 'Jose', 'P', 'Rizal', 'R', 30.00, 40013, 30002),
+			(35004, 'Andres', 'A', 'Bonifacio', 'R', 20.00, 40014, 30003),
+			(35005, 'Gabriela', 'R', 'Silang', 'R', 20.00, 40015, 30003),
+			(35006, 'Juan', 'M', 'Luna', 'R', 20.00, NULL, 30003),
+			(35007, 'John', 'R', 'Smith', 'NR', 40.00, NULL, 30004),
+			(35008, 'Jane', 'G', 'Smith', 'NR', 40.00, NULL, 30008),
+			(35009, 'Maria', 'P', 'Garcia', 'NR', 50.00, NULL, 30009),
+			(35010, 'Carlos', 'A', 'Garcia', 'NR', 50.00, NULL, 30010);
 
 -- -----------------------------------------------------
 -- Add records to evidence

@@ -389,7 +389,6 @@ CREATE TABLE IF NOT EXISTS sticker (
 -- -----------------------------------------------------
 -- Table hoaofficer_sched
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS hoaofficer_sched;
 CREATE TABLE IF NOT EXISTS hoaofficer_sched (
   officer_id	INT(5) NOT NULL,
   sched_time	ENUM('AM', 'PM') NOT NULL,
@@ -495,6 +494,7 @@ CREATE TABLE IF NOT EXISTS dues
     FOREIGN KEY (household_id)
 		REFERENCES household(household_id)
 );
+
 -- -----------------------------------------------------
 -- Table household_account
 -- -----------------------------------------------------
@@ -516,6 +516,7 @@ CREATE TABLE IF NOT EXISTS household_account
     FOREIGN KEY (household_id)
 		REFERENCES household(household_id)
 );
+
 -- -----------------------------------------------------
 -- Table payments
 -- -----------------------------------------------------
@@ -592,9 +593,9 @@ DROP TABLE IF EXISTS evidence;
 CREATE TABLE IF NOT EXISTS evidence (
   evidence_id 		  INT NOT NULL,
   name 				  VARCHAR(45) NOT NULL,
-  description 		  VARCHAR(255) NOT NULL,
+  description 		  VARCHAR(250) NOT NULL,
   file_name 		  VARCHAR(45) NOT NULL,
-  submitting_resident INT NOT NULL,
+  submitting_resident INT(5),
   accepting_officer   INT NOT NULL,
   date_submitted 	  DATE NOT NULL,
   incident_id 		  INT NOT NULL,
@@ -637,6 +638,7 @@ CREATE TABLE IF NOT EXISTS incentives_anddiscounts (
         REFERENCES 			   resident(resident_id),
     FOREIGN KEY				   (authorizing_officer)
         REFERENCES 			   hoa_officer(officer_id)
+    
 );
 
 -- -----------------------------------------------------
@@ -730,7 +732,7 @@ CREATE TABLE IF NOT EXISTS donation_picture (
 -- -----------------------------------------------------
 -- Add records to regions
 -- -----------------------------------------------------
-INSERT INTO	regions
+INSERT INTO	regions (region)
 	VALUES	('Region I'),
 			('Region II'),
 			('Region III'),
@@ -752,7 +754,7 @@ INSERT INTO	regions
 -- -----------------------------------------------------
 -- Add records to provinces
 -- -----------------------------------------------------
-INSERT INTO	provinces
+INSERT INTO	provinces (province_name, region)
 	VALUES	('Metro Manila','NCR'),
 			('Bataan','Region III'),
 			('Batangas','Region IV-A'),
@@ -762,7 +764,7 @@ INSERT INTO	provinces
 -- -----------------------------------------------------
 -- Add records to cities
 -- -----------------------------------------------------
-INSERT INTO	cities
+INSERT INTO	cities (city, province)
 	VALUES	('Manila','Metro Manila'),
 			('Pasay','Metro Manila'),
 			('Pasig','Metro Manila'),
@@ -772,7 +774,7 @@ INSERT INTO	cities
 -- -----------------------------------------------------
 -- Add records to zipcodes
 -- -----------------------------------------------------
-INSERT INTO	zipcodes
+INSERT INTO	zipcodes (zipcode, brgy, city, province)
 	VALUES	('1001','680','Manila','Metro Manila'),
 			('1002','780','Manila','Metro Manila'),
 			('1003','880','Manila','Metro Manila');
@@ -780,19 +782,18 @@ INSERT INTO	zipcodes
 -- -----------------------------------------------------
 -- Add records to address
 -- -----------------------------------------------------
-INSERT INTO	address
+INSERT INTO	address (address_id, stno, stname, brgy, city, province, zipcode, x_coord, y_coord)
 	VALUES	(10000020, '24', 'De La Salle St.', '680', 'Manila', 'Metro Manila', 1001, 123.4567, 234.5678),
 			(10000021, '45', 'De La Salle St.', '680', 'Manila', 'Metro Manila', 1001, 345.6789, 456.7890),
 			(10000022, '77', 'Benilde St.', '680', 'Manila', 'Metro Manila', 1001, 567.8901, 678.9101),
             (10000023, '13', 'Mutien-Marie St.', '680', 'Manila', 'Metro Manila', 1001, 789.1011, 891.0111),
             (10000024, '50', 'Green Archer St.', '780', 'Manila', 'Metro Manila', 1002, 910.1112, 101.1121),
             (10000025, '11', 'Reims St.', '780', 'Manila', 'Metro Manila', 1002, 131.4151, 617.1819),
-            (10000026, '11', 'Reims St.', '780', 'Manila', 'Metro Manila', 1002, 131.4151, 617.1819);
-
+(10000026, '11', 'Reims St.', '780', 'Manila', 'Metro Manila', 1002, 131.4151, 617.1819);
 -- -----------------------------------------------------
 -- Add records to hoa
 -- -----------------------------------------------------
-INSERT INTO	hoa
+INSERT INTO	hoa (hoa_name, office_add, year_est, website, subd_name, dues_collection)
 	VALUES	('Animo HOA', 10000020, 1911, 'www.animohoa.ph', 'Animo Green Homes', '15'),
 			('Archer’s HOA', 10000024, 1999, 'www.archershoa.ph', 'Archer’s Residences', '10'),
 			('Berde 1 HOA', 10000025, 2005, 'www.berdehoa.ph', 'Berde Subdivision 1', '20');
@@ -800,7 +801,7 @@ INSERT INTO	hoa
 -- -----------------------------------------------------
 -- Add records to individual
 -- -----------------------------------------------------
-INSERT INTO	individual
+INSERT INTO	individual (individual_id, indiv_lastname, indiv_firstname, indiv_mi, email, birthday, gender, fb_url, picture, indiv_type)
 	VALUES	(2023202410, 'Dela Cruz', 'Juan', 'R', 'juandelacruz@gmail.com', '2000-01-05', 'M', 'jdlcruz', 'pic1.jpg', 'R'),
 			(2023202411, 'Dela Cruz', 'Juanita', 'G', 'juanitadelacruz@gmail.com', '2002-10-10', 'F', 'juanitadlc', 'pic2.jpg', 'HR'),
 			(2023202412, 'Rizal', 'Jose', 'P', 'joserizal@gmail.com', '1961-06-19', 'M', 'jprizal', 'pic3.jpg', 'HR'),
@@ -809,11 +810,12 @@ INSERT INTO	individual
 			(2023202415, 'Luna', 'Juan', 'M', 'juanluna@gmail.com', '1991-03-19', 'M', 'jluna', 'pic5.jpg', 'H'),
 			(2023202416, 'Aguinaldo', 'Emilio', ' ', 'eaguinaldo@yahoo.com', '1969-03-22', 'M', 'eaguin', 'pic6.jpg','HR'),
 			(2023202417, 'Felipe', 'Julian', 'R', 'julian_felipe@hotmail.com', '1969-01-28', 'M', NULL, 'pic7.jpg','H'),
-            (2023202418, 'Agoncillo', 'Lorenza', 'M', 'flagoncillo@gmail.com', '1990-09-05', 'F', 'loragoncillo', 'pic6.jpg','R');
+(2023202418, 'Agoncillo', 'Lorenza', 'M', 'flagoncillo@gmail.com', '1990-09-05', 'F', 'loragoncillo', 'pic6.jpg','R');
+
 -- -----------------------------------------------------
 -- Add records to homeowner
 -- -----------------------------------------------------
-INSERT INTO	homeowner
+INSERT INTO	homeowner (homeowner_id, years_ho, undertaking, membership, is_resident, current_add, other_add, other_email, hoa_name, individual_id)
 	VALUES	(30011, 5, 1, 1, 1, 10000021, NULL, NULL, 'Animo HOA', 2023202410),
 			(30012, 12, 1, 1, 1, 10000022, NULL, NULL, 'Animo HOA', 2023202412),
 			(30013, 10, 1, 1, 1, 10000023, NULL, NULL, 'Animo HOA', 2023202414),
@@ -824,7 +826,7 @@ INSERT INTO	homeowner
 -- -----------------------------------------------------
 -- Add records to officer_positions
 -- -----------------------------------------------------
-INSERT INTO	officer_positions
+INSERT INTO	officer_positions (position_name)
 	VALUES	('President'),
 			('Vice-President'),
 			('Secretary'),
@@ -834,7 +836,7 @@ INSERT INTO	officer_positions
 -- -----------------------------------------------------
 -- Add records to elections
 -- -----------------------------------------------------
-INSERT INTO	elections
+INSERT INTO	elections (elec_date, venue, quorum, witness_lastname, witness_firstname, witness_mi, witness_mobile, hoa_name)
 	VALUES	('2022-1-12', 'Animo Clubhouse', 0, 'Aquino', 'Melchora', 'B',9172001434, 'Animo HOA'),
 			('2022-11-19', 'Animo Clubhouse', 0, 'Del Pilar', 'Gregorio', 'A',9224657809, 'Animo HOA'),
 			('2022-11-26', 'Animo Clubhouse', 1, 'Balagtas', 'Francisco', 'K',9224657809, 'Animo HOA');
@@ -842,7 +844,7 @@ INSERT INTO	elections
 -- -----------------------------------------------------
 -- Add records to hoa_officer
 -- -----------------------------------------------------
-INSERT INTO	hoa_officer
+INSERT INTO	hoa_officer (officer_id, homeowner_id, position_name, office_start, office_end, elec_date)
 	VALUES	(99901, 30012, 'President', '2023-01-09','2024-01-07','2022-11-26'),
 			(99902, 30013, 'Secretary', '2023-01-09','2024-01-07','2022-11-26'),
             (99903, 30014, 'Treasurer', '2023-01-09', '2024-01-07', '2022-11-26'), 
@@ -852,7 +854,7 @@ INSERT INTO	hoa_officer
 -- -----------------------------------------------------
 -- Add records to hoa_files
 -- -----------------------------------------------------
-INSERT INTO	hoa_files
+INSERT INTO	hoa_files (file_id, file_name, description, location, file_type, date_submitted, file_owner, file_uploader, hoa_name)
 	VALUES	(555556661,'bylaws.pdf', 'notarized by-laws','D:/Animo HOA Documents/', 'pdf', '2020-03-17', 'Jose Rizal', 99901, 'Animo HOA'),
 			(555556662,'ABC1234-ORCR2022.pdf', 'ABC1234 ORCR 2022','D:/Animo HOA Documents/Vehicle Registration/', 'pdf', '2022-05-06', 'Juan Dela Cruz', 99902, 'Animo HOA'),
             (555556663,'DEF6789-ORCR2022.pdf', 'DEF6789 ORCR 2022','D:/Animo HOA Documents/Vehicle Registration/', 'pdf', '2022-05-10', 'Emilio Aguinaldo', 99902, 'Animo HOA'),
@@ -865,22 +867,22 @@ INSERT INTO	hoa_files
 			(555556675, 'donation_form_07.pdf', 'Donation Form 07', 'D:/Animo HOA Documents/Donation Forms/', 'pdf', '2022-09-10', 'Antonio Luna', 99901, 'Animo HOA'),
 			(555556676, 'donation_form_08.pdf', 'Donation Form 08', 'D:/Animo HOA Documents/Donation Forms/', 'pdf', '2022-09-13', 'Josefa Llanes Escoda', 99902, 'Animo HOA'),
 			(555556677, 'donation_form_09.pdf', 'Donation Form 09', 'D:/Animo HOA Documents/Donation Forms/', 'pdf', '2022-09-15', 'Hilaria Del Rosario', 99902, 'Animo HOA'),
-			(555556678, 'donation_form_10.pdf', 'Donation Form 10', 'D:/Animo HOA Documents/Donation Forms/', 'pdf', '2022-09-18', 'Jose Rizal', 99901, 'Animo HOA');
+(555556678, 'donation_form_10.pdf', 'Donation Form 10', 'D:/Animo HOA Documents/Donation Forms/', 'pdf', '2022-09-18', 'Jose Rizal', 99901, 'Animo HOA');
 
 -- -----------------------------------------------------
 -- Add records to property
 -- -----------------------------------------------------
-INSERT INTO	property
+INSERT INTO	property (property_code, size, turnover, property_type, homeowner_id)
 	VALUES	('B35L02', 300.00, '2018-02-15', 'R', 30011),
 			('B11L08', 180.00, '2011-03-16', 'R', 30012),
             ('B42L09', 225.00, '2013-04-17', 'R', 30013),
             ('B25L10', 250.00, '2017-05-18', 'R', 30014),
-            ('B39L13', 180.00, '2020-06-19', 'C', 30014);
+('B39L13', 180.00, '2020-06-19', 'C', 30014);
 
 -- -----------------------------------------------------
 -- Add records to household
 -- -----------------------------------------------------
-INSERT INTO	household
+INSERT INTO	household (household_id)
 	VALUES	(42001),
 			(42002),
 			(42003),
@@ -890,11 +892,12 @@ INSERT INTO	household
 			(42007),
 			(42008),
 			(42009),
-			(42010);
+(42010);
+
 -- -----------------------------------------------------
 -- Add records to resident
 -- -----------------------------------------------------
-INSERT INTO	resident
+INSERT INTO	resident (resident_id, is_renter, relation_ho, undertaking, household_id, authorized_resident, individual_id)
 	VALUES	(40011, 0, 'husband', 1, 42001, 1, 2023202410),
 			(40012, 0, 'homeowner', 1, 42001, 1, 2023202411),
             (40013, 0, 'homeowner', 1, 42002, 1, 2023202412),
@@ -908,7 +911,7 @@ INSERT INTO	resident
 -- -----------------------------------------------------
 -- Add records to receipt
 -- -----------------------------------------------------
-INSERT INTO	receipt
+INSERT INTO	receipt (or_no, transact_date, total_amount)
 	VALUES	(202379991,'2023-07-20',1500.00),
 			(202379992,'2023-08-25',2250.00),
             (202379993,'2023-09-01',830.00);
@@ -916,7 +919,7 @@ INSERT INTO	receipt
 -- -----------------------------------------------------
 -- Add records to resident_idcard
 -- -----------------------------------------------------
-INSERT INTO	resident_idcard
+INSERT INTO	resident_idcard (resident_idcardno, date_requested, request_reason, date_issued, authorizing_officer, or_no, amount_paid, id_status, resident_id)
 	VALUES	('ANIMO22001', '2022-01-30', 'New ID', '2022-02-04', 99902, NULL, 0.00, 'Active', 40013),
 			('ANIMO22002', '2022-02-20-', 'New ID', '2022-02-04-', 99902, NULL, 0.00, 'Active', 40011),
             ('ANIMO22003', '2022-02-20', 'New ID', '2022-02-04', 99902, NULL, 0.00, 'Active', 40012),
@@ -926,7 +929,7 @@ INSERT INTO	resident_idcard
 -- -----------------------------------------------------
 -- Add records to mobile
 -- -----------------------------------------------------
-INSERT INTO	mobile
+INSERT INTO	mobile (mobile_no, individual_id)
 	VALUES	(9175459870, 2023202410),
 			(9173110229, 2023202411),
             (9207639255, 2023202412),
@@ -937,35 +940,35 @@ INSERT INTO	mobile
 -- -----------------------------------------------------
 -- Add records to vehicle
 -- -----------------------------------------------------
-INSERT INTO	vehicle
+INSERT INTO	vehicle (plate_no, owner_lastname, owner_firstname, owner_mi, resident_id, vehicle_class, vehicle_type, date_registered, reg_fee, or_no)
 	VALUES	('ABC1234', 'Dela Cruz', 'Juan', 'R', 40011, 'P', 'SUV', '2023-07-20', 150.00, 202379991),
 			('DEF6789', 'Aguinaldo', 'Emilio', 'N', NULL, 'C', 'truck', '2023-09-01', 500.00, 202379992);
 
 -- -----------------------------------------------------
 -- Add records to orcr
 -- -----------------------------------------------------
-INSERT INTO	orcr
+INSERT INTO	orcr (orcr, plate_no, years_valid, orcr_file)
 	VALUES	('ORCR-109634885P', 'ABC1234', '2023-02-20 to 2024-02-19', 555556662),
 			('ORCR-217459009C', 'DEF6789', '2023-06-25 to 2024-06-24', 555556663);
 
 -- -----------------------------------------------------
 -- Add records to sticker
 -- -----------------------------------------------------
-INSERT INTO	sticker
+INSERT INTO	sticker (sticker_id, year_valid, plate_no, owner_type, authorizing_officer, date_acquired, amount_paid, or_no)
 	VALUES	(202300100, 2023, 'ABC1234', 'R', 99902, '2023-07-20', 0.00, NULL),
 			(202300600, 2023, 'DEF6789', 'NR', 99902, '2023-09-01', 1500.00, 202379992);
 
 -- -----------------------------------------------------
 -- Add records to hoaofficer_sched
 -- -----------------------------------------------------
-INSERT INTO	hoaofficer_sched
+INSERT INTO	hoaofficer_sched (officer_id, sched_time, avail_Mon, avail_Tue, avail_Wed, avail_Thu, avail_Fri, avail_Sat, avail_Sun)
 	VALUES	(99901, 'AM', 1, 1, 1, 1, 1, 1, 1),
 			(99902, 'PM', 1, 1, 1, 1, 1, 1, 1);
 
 -- -----------------------------------------------------
 -- Add records to asset
 -- -----------------------------------------------------
-INSERT INTO	asset
+INSERT INTO	asset (asset_id, asset_name, description, date_acquired, for_rent, asset_value, asset_type, asset_status, location, location_x, location_y, hoa_name, asset_container)
 	VALUES	('P000000001', 'Animo HOA Clubhouse', 'clubhouse', '1995-10-06', 1, 18000000.00, 'P', 'W', '24 De La Salle St.', 123.4567, 234.5678, 'Animo HOA', NULL),
 			('E000000001', 'LED projector', 'projector', '2021-12-01', 1, 75000.00, 'E', 'W', '24 De La Salle St.', 123.4567, 234.5678, 'Animo HOA', 'P000000001'),
             ('P000000002', 'Animo HOA Basketball Court', 'basketball court', '1996-04-01', 1, 9000000.00, 'P', 'W', '01 Benilde St.', 543.2100, 765.4321, 'Animo HOA', NULL);
@@ -973,22 +976,22 @@ INSERT INTO	asset
 -- -----------------------------------------------------
 -- Add records to commercial_prop
 -- -----------------------------------------------------
-INSERT INTO	commercial_prop
+INSERT INTO	commercial_prop (property_code, commercial_type, commercial_maxten)
 	VALUES	('B39L13','M',10);
 
 -- -----------------------------------------------------
 -- Add records to residential_prop
 -- -----------------------------------------------------
-INSERT INTO	residential_prop
+INSERT INTO	residential_prop (property_code, household_id)
 	VALUES	('B35L02', 42001),
 			('B11L08', 42002),
             ('B42l09', 42003),
             ('B25L10', 42004);
-            
+
 -- -----------------------------------------------------
 -- Add records to monthly_duebill
 -- -----------------------------------------------------
-	INSERT INTO	monthly_duebill
+	INSERT INTO	monthly_duebill (monthly_duebillid, date_generated, household_id)
 	VALUES	(10001, '2023-11-01', 42001), 
 			(10002, '2023-11-01', 42002),
 			(10003, '2023-11-01', 42003),
@@ -999,11 +1002,11 @@ INSERT INTO	residential_prop
 			(10008, '2023-11-01', 42008),
 			(10009, '2023-11-01', 42009),
 			(10010, '2023-11-01', 42010);
-    
+            
 -- -----------------------------------------------------
 -- Add records to payments
 -- -----------------------------------------------------
-INSERT INTO	payments
+INSERT INTO	payments (or_number, payment_date, amount_paid, paying_resident, receiving_officer)
 	VALUES	('PMT01', '2023-11-05', 580.00, 40011, 99901),
 			('PMT02', '2023-11-05', 585.00, 40012, 99902),
 			('PMT03', '2023-11-05', 545.00, 40013, 99903),
@@ -1016,7 +1019,7 @@ INSERT INTO	payments
 -- -----------------------------------------------------
 -- Add records to household_account
 -- -----------------------------------------------------
-INSERT INTO household_account 
+INSERT INTO household_account (household_id, outstanding_balance)
 	VALUES (42001, 0.0),
 		   (42002, -300.0),
            (42003, 1000.0), 
@@ -1030,7 +1033,7 @@ INSERT INTO household_account
 -- -----------------------------------------------------
 -- Add records to dues
 -- -----------------------------------------------------
-INSERT INTO dues
+INSERT INTO dues (due_id, due_desc, due_amount, date_incurred, household_id)
 	VALUES (111222, 'Penalty', 2000.00, '2023-11-05', 42001),
 		   (111223, 'Property damage', 100.00, '2023-11-02', 42002),
            (111224, 'Property damage', 100.00, '2023-11-02', 42005),
@@ -1043,7 +1046,7 @@ INSERT INTO dues
 -- -----------------------------------------------------
 -- Add records to incident
 -- -----------------------------------------------------
-INSERT INTO	incident
+INSERT INTO	incident (incident_id, date, description, rulenum_violated, investigating_officer, seconding_officer)
 	VALUES	(30001, '2023-01-15', 'Noise Complaint', 1, 99901, 99902), 
 			(30002, '2023-02-02', 'Unauthorized Parking', 2, 99902, 99901),
 			(30003, '2023-02-10', 'Trash Disposal Violation', 3, 99901, 99902),
@@ -1054,11 +1057,10 @@ INSERT INTO	incident
 			(30008, '2023-04-10', 'Pool Rule Violation', 8, 99902, 99901),
 			(30009, '2023-04-25', 'Late Rent Payment', 9, 99901, 99902),
 			(30010, '2023-05-02', 'Unauthorized Guest', 10, 99902, 99901);
-
 -- -----------------------------------------------------
 -- Add records to person_involved
 -- -----------------------------------------------------
-INSERT INTO	person_involved
+INSERT INTO	person_involved (person_involvedid, first_name, middle_name, last_name, pi_type, penalty_imposed, resident_id, incident_id)    
 	VALUES	(35001, 'Juan', 'R', 'Dela Cruz', 'R', 50.00, 40011, 30001), 
 			(35002, 'Juanita', 'G', 'Dela Cruz', 'R', 30.00, 40012, 30002),
 			(35003, 'Jose', 'P', 'Rizal', 'R', 30.00, 40013, 30002),
@@ -1069,36 +1071,29 @@ INSERT INTO	person_involved
 			(35008, 'Jane', 'G', 'Smith', 'NR', 40.00, NULL, 30008),
 			(35009, 'Maria', 'P', 'Garcia', 'NR', 50.00, NULL, 30009),
 			(35010, 'Carlos', 'A', 'Garcia', 'NR', 50.00, NULL, 30010);
-
 -- -----------------------------------------------------
 -- Add records to evidence
 -- -----------------------------------------------------
-INSERT INTO	evidence
-	VALUES	(50001, 'Picture of Graffiti', 'Picture of graffiti found on building wall', 'graffiti.jpg', 40011, 99901, '2023-01-15', 30001), 
-			(50002, 'Unauthorized Parking Vehicle', 'Picture of unauthorized vehicle parked in restricted area', 'parking.jpg', 40013, 99902, '2023-01-16', 30002),
-			(50003, 'Trash Bags in Common Area', 'Picture of trash bags left in common area', 'trash.jpg', 40011, 99901, '2023-01-17', 30003),
-			(50004, 'Unauthorized Pet in Premises', 'Picture of unauthorized pet inside the building', 'pet.jpg', 40014, 99902, '2023-01-18', 30004),
-			(50005, 'Noise Complaint Audio Clip', 'Audio clip recording of loud party complaint', 'noise.wav', 40012, 99901, '2023-01-19', 30005);
+INSERT INTO	evidence (evidence_id, name, description, file_name, submitting_resident, accepting_officer, date_submitted, incident_id)
+	VALUES	(50001, 'Picture of Graffiti', 'Found on building wall', 'graffiti.jpg', 40011, 99901, '2023-01-15', 30001), 
+			(50002, 'Unauthorized Parking Vehicle', 'Unauthorized vehicle parked in restricted area', 'parking.jpg', 40013, 99902, '2023-01-16', 30002),
+			(50003, 'Trash Bags in Common Area', 'Trash bags left in common area', 'trash.jpg', 40011, 99901, '2023-01-17', 30003),
+			(50004, 'Unauthorized Pet in Premises', 'Unauthorized pet inside the building', 'pet.jpg', 40014, 99902, '2023-01-18', 30004),
+			(50005, 'Noise Complaint Audio Clip', 'Loud party complaint', 'noise.wav', 40012, 99901, '2023-01-19', 30005);
     
 -- -----------------------------------------------------
 -- Add records to incentives_anddiscounts
 -- -----------------------------------------------------
-INSERT INTO	incentives_anddiscounts
+INSERT INTO	incentives_anddiscounts (incentives_anddiscounts_id, bill_period, awarded_resident, classification, amount_orrate, reason, authorizing_officer)
 	VALUES	(70001, 10001, 40011, 'I', 20.00, 'Exemplary Behavior', 99901), 
 			(70002, 10002, 40012, 'D', 10.00, 'Early Payment', 99902),
 			(70003, 10003, 40013, 'I', 15.00, 'Loyalty Reward', 99901),
-			(70004, 10004, 40014, 'D', 5.00, 'Neighborly Support', 99902),
-			(70005, 10005, 40015, 'I', 25.00, 'Community Participation', 99901),
-			(70006, 10006, 40011, 'D', 10.00, 'Early Payment Discount', 99902),
-			(70007, 10007, 40012, 'I', 30.00, 'Home Improvement Award', 99901),
-			(70008, 10008, 40013, 'D', 15.00, 'Outstanding Volunteer', 99902),
-			(70009, 10009, 40014, 'I', 35.00, 'Community Leadership', 99901),
-			(70010, 10010, 40015, 'D', 20.00, 'Environmental Stewardship', 99902);
-		
+			(70004, 10004, 40014, 'D', 5.00, 'Neighborly Support', 99902);
+
 -- -----------------------------------------------------
 -- Add records to nonmonetary_incentives
 -- -----------------------------------------------------
-INSERT INTO	nonmonetary_incentives
+INSERT INTO	nonmonetary_incentives (incentive_id, description, validity_startdate, validity_enddate, status, reason, authorizing_officer, awarded_resident)
 	VALUES	(80011, 'Free Art Workshop Pass', '2023-01-01', '2023-12-31', 'Valid', 'Creative Skill Development Program', 99901, 40011),
 			(80012, 'Community Clean-up Initiative', '2023-01-15', '2023-12-31', 'Expired', 'Neighborhood Cleanup Drive', 99902, 40012),
 			(80013, 'Gardening Workshop Access', '2023-02-01', '2023-12-31', 'Valid', 'Green Thumb Workshop Series', 99901, 40013),
@@ -1109,11 +1104,10 @@ INSERT INTO	nonmonetary_incentives
 			(80018, 'Digital Art Showcase Opportunity', '2023-04-15', '2023-12-31', 'Valid', 'Creative Digital Expression Platform', 99902, 40013),
 			(80019, 'Tree Planting Project Support', '2023-05-01', '2023-12-31', 'Valid', 'Greening the Community Initiative', 99901, 40014),
 			(80020, 'Active Participation in Events', '2023-05-15', '2023-12-31', 'Valid', 'Community Event Involvement Recognition', 99902, 40015);
-
 -- -----------------------------------------------------
 -- Add records to donation
 -- -----------------------------------------------------
-INSERT INTO	donation
+INSERT INTO	donation (donation_id, donor_firstname, donor_middlename, donor_lastname, donor_type, donor_address, donation_date, donation_form, status, accepting_officer)
 	VALUES	(60001, 'Juan', '', 'Dela Cruz', 'R', 10000020, '2023-01-05', 555556663, 'Existing', 99901),
             (60002, 'Juanita', '', 'Dela Cruz', 'R', 10000021, '2023-01-10', 555556662, 'Deleted', 99902),
             (60003, 'Jose', '', 'Rizal', 'R', 10000022, '2023-01-15', 555556678, 'Existing', 99902),
@@ -1121,11 +1115,10 @@ INSERT INTO	donation
             (60005, 'Gabriela', '', 'Silang', 'R', 10000024, '2023-02-05', 555556670, 'Existing', 99902),
             (60006, 'Juan', '', 'Luna', 'R', 10000025, '2023-02-10', 555556669, 'Existing', 99901),
             (60007, 'Carlos', '', 'Garcia', 'NR', 10000026, '2023-02-15', 555556670, 'Deleted', 99902);
-
 -- -----------------------------------------------------
 -- Add records to donation_picture
 -- -----------------------------------------------------
-INSERT INTO	donation_picture
+INSERT INTO	donation_picture (donation_pictureid, picture, donation_id)
 	VALUES	(62001, 'receipt_2023.jpg', 60001), 
             (62002, 'thank_you_note.jpg', 60002),
             (62003, 'certificate_of_appreciation.jpg', 60002),
@@ -1133,11 +1126,10 @@ INSERT INTO	donation_picture
             (62005, 'donation_event_snapshot.jpg', 60005),
             (62006, 'donation_received.jpg', 60006),
             (62007, 'donor_thank_you_card.jpg', 60007);
-
 -- -----------------------------------------------------
 -- Add records to donation_item
 -- -----------------------------------------------------
-INSERT INTO	donation_item
+INSERT INTO	donation_item (donation_itemid, amount, description, donation_id)
 	VALUES	(65001, 100.00, 'Cash donation for school supplies', 60001), 
             (65002, 250.00, 'Food donation for community event', 60002),
             (65003, 150.00, 'Clothing donation for winter drive', 60003),
@@ -1145,4 +1137,4 @@ INSERT INTO	donation_item
             (65005, 300.00, 'Toy donation for children in need', 60005),
             (65006, 200.00, 'Book donation for local library', 60006),
             (65007, 350.00, 'Cash donation for disaster relief', 60007),
-            (65011, 220.00, 'Clothing donation for local shelter', 60001);
+(65011, 220.00, 'Clothing donation for local shelter', 60001);

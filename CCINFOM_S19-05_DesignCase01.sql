@@ -810,7 +810,7 @@ INSERT INTO	individual (individual_id, indiv_lastname, indiv_firstname, indiv_mi
 			(2023202415, 'Luna', 'Juan', 'M', 'juanluna@gmail.com', '1991-03-19', 'M', 'jluna', 'pic5.jpg', 'H'),
 			(2023202416, 'Aguinaldo', 'Emilio', ' ', 'eaguinaldo@yahoo.com', '1969-03-22', 'M', 'eaguin', 'pic6.jpg','HR'),
 			(2023202417, 'Felipe', 'Julian', 'R', 'julian_felipe@hotmail.com', '1969-01-28', 'M', NULL, 'pic7.jpg','H'),
-(2023202418, 'Agoncillo', 'Lorenza', 'M', 'flagoncillo@gmail.com', '1990-09-05', 'F', 'loragoncillo', 'pic6.jpg','R');
+			(2023202418, 'Agoncillo', 'Lorenza', 'M', 'flagoncillo@gmail.com', '1990-09-05', 'F', 'loragoncillo', 'pic6.jpg','R');
 
 -- -----------------------------------------------------
 -- Add records to homeowner
@@ -867,7 +867,7 @@ INSERT INTO	hoa_files (file_id, file_name, description, location, file_type, dat
 			(555556675, 'donation_form_07.pdf', 'Donation Form 07', 'D:/Animo HOA Documents/Donation Forms/', 'pdf', '2022-09-10', 'Antonio Luna', 99901, 'Animo HOA'),
 			(555556676, 'donation_form_08.pdf', 'Donation Form 08', 'D:/Animo HOA Documents/Donation Forms/', 'pdf', '2022-09-13', 'Josefa Llanes Escoda', 99902, 'Animo HOA'),
 			(555556677, 'donation_form_09.pdf', 'Donation Form 09', 'D:/Animo HOA Documents/Donation Forms/', 'pdf', '2022-09-15', 'Hilaria Del Rosario', 99902, 'Animo HOA'),
-(555556678, 'donation_form_10.pdf', 'Donation Form 10', 'D:/Animo HOA Documents/Donation Forms/', 'pdf', '2022-09-18', 'Jose Rizal', 99901, 'Animo HOA');
+			(555556678, 'donation_form_10.pdf', 'Donation Form 10', 'D:/Animo HOA Documents/Donation Forms/', 'pdf', '2022-09-18', 'Jose Rizal', 99901, 'Animo HOA');
 
 -- -----------------------------------------------------
 -- Add records to property
@@ -877,7 +877,7 @@ INSERT INTO	property (property_code, size, turnover, property_type, homeowner_id
 			('B11L08', 180.00, '2011-03-16', 'R', 30012),
             ('B42L09', 225.00, '2013-04-17', 'R', 30013),
             ('B25L10', 250.00, '2017-05-18', 'R', 30014),
-('B39L13', 180.00, '2020-06-19', 'C', 30014);
+			('B39L13', 180.00, '2020-06-19', 'C', 30014);
 
 -- -----------------------------------------------------
 -- Add records to household
@@ -892,7 +892,7 @@ INSERT INTO	household (household_id)
 			(42007),
 			(42008),
 			(42009),
-(42010);
+			(42010);
 
 -- -----------------------------------------------------
 -- Add records to resident
@@ -1108,13 +1108,13 @@ INSERT INTO	nonmonetary_incentives (incentive_id, description, validity_startdat
 -- Add records to donation
 -- -----------------------------------------------------
 INSERT INTO	donation (donation_id, donor_firstname, donor_middlename, donor_lastname, donor_type, donor_address, donation_date, donation_form, status, accepting_officer)
-	VALUES	(60001, 'Juan', '', 'Dela Cruz', 'R', 10000020, '2023-01-05', 555556663, 'Existing', 99901),
-            (60002, 'Juanita', '', 'Dela Cruz', 'R', 10000021, '2023-01-10', 555556662, 'Deleted', 99902),
-            (60003, 'Jose', '', 'Rizal', 'R', 10000022, '2023-01-15', 555556678, 'Existing', 99902),
-            (60004, 'Andres', '', 'Bonifacio', 'R', 10000023, '2023-02-01', 555556677, 'Existing', 99901),
-            (60005, 'Gabriela', '', 'Silang', 'R', 10000024, '2023-02-05', 555556670, 'Existing', 99902),
-            (60006, 'Juan', '', 'Luna', 'R', 10000025, '2023-02-10', 555556669, 'Existing', 99901),
-            (60007, 'Carlos', '', 'Garcia', 'NR', 10000026, '2023-02-15', 555556670, 'Deleted', 99902);
+	VALUES	(60001, 'Juan', 'R', 'Dela Cruz', 'R', 10000020, '2023-01-05', 555556663, 'Existing', 99901),
+            (60002, 'Juanita', 'G', 'Dela Cruz', 'R', 10000021, '2023-01-10', 555556662, 'Deleted', 99902),
+            (60003, 'Jose', 'P', 'Rizal', 'R', 10000022, '2023-01-15', 555556678, 'Existing', 99902),
+            (60004, 'Andres', 'A', 'Bonifacio', 'R', 10000023, '2023-02-01', 555556677, 'Existing', 99901),
+            (60005, 'Gabriela', 'R', 'Silang', 'R', 10000024, '2023-02-05', 555556670, 'Existing', 99902),
+            (60006, 'Juan', 'M', 'Luna', 'R', 10000025, '2023-02-10', 555556669, 'Existing', 99901),
+            (60007, 'Carlos', 'P', 'Garcia', 'NR', 10000026, '2023-02-15', 555556670, 'Deleted', 99902);
 -- -----------------------------------------------------
 -- Add records to donation_picture
 -- -----------------------------------------------------
@@ -1137,4 +1137,4 @@ INSERT INTO	donation_item (donation_itemid, amount, description, donation_id)
             (65005, 300.00, 'Toy donation for children in need', 60005),
             (65006, 200.00, 'Book donation for local library', 60006),
             (65007, 350.00, 'Cash donation for disaster relief', 60007),
-(65011, 220.00, 'Clothing donation for local shelter', 60001);
+			(65011, 220.00, 'Clothing donation for local shelter', 60001);
